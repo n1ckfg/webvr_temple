@@ -1,7 +1,7 @@
 "use strict";
 
-var renderer, scene, camera, controls, effect, clock, light;
-var boxWidth, params, manager, lastRender;
+var renderer, scene, camera, controls, clock, light, canvas;
+var boxWidth, params, lastRender; // , manager, effect;
 
 var sprites = [];
 var colliders = [];
@@ -17,18 +17,20 @@ var gravity = 0.01;
 var cameraGaze;
 
 function init() {
-    renderer = new THREE.WebGLRenderer({antialias: false});
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
-
-    document.body.appendChild(renderer.domElement);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    canvas = renderer.domElement;
+    document.body.appendChild(canvas);
+    window.addEventListener('resize', onResize, false);
 
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
     controls = new THREE.VRControls(camera);
-    effect = new THREE.VREffect(renderer);
-    effect.setSize(window.innerWidth, window.innerHeight);
+    //effect = new THREE.VREffect(renderer);
+    ///effect.setSize(window.innerWidth, window.innerHeight);
 
     clock = new THREE.Clock;
 
@@ -37,11 +39,27 @@ function init() {
         isUndistorted: false
     };
 
-    manager = new WebVRManager(renderer, effect, params);
+    //manager = new WebVRManager(renderer, effect, params);
 
     lastRender = 0;
 
     setupPlayer();
+}
+
+function onResize() {
+  // The delay ensures the browser has a chance to layout
+  // the page and update the clientWidth/clientHeight.
+  // This problem particularly crops up under iOS.
+  if (!onResize.resizeDelay) {
+    onResize.resizeDelay = setTimeout(function () {
+      onResize.resizeDelay = null;
+      console.log('Resizing to %s x %s.', window.innerWidth, window.innerHeight);
+      //effect.setSize(canvas.clientWidth, canvas.clientHeight, false);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }, 250);
+  }
 }
 
 function render(timestamp) {
@@ -51,7 +69,8 @@ function render(timestamp) {
     updatePlayer();
     controls.update();
 
-    manager.render(scene, camera, timestamp);
+    //manager.render(scene, camera, timestamp);
+    renderer.render(scene, camera);
 }
 
 function setupControls() {
