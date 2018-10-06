@@ -28,7 +28,7 @@ function init() {
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-    controls = new THREE.VRControls(camera);
+    controls = new THREE.WasdControls(camera);
     //effect = new THREE.VREffect(renderer);
     ///effect.setSize(window.innerWidth, window.innerHeight);
 
